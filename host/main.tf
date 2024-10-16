@@ -1,4 +1,4 @@
-resource "aws_instance" "public_instance" {
+resource "aws_instance" "host" {
   ami                   = var.ami_id
   instance_type         = var.instance_type
   subnet_id             = var.public_subnet_id
@@ -13,6 +13,6 @@ resource "aws_instance" "public_instance" {
 
 }
 resource "local_file" "instance_ip" {
-  content  = aws_instance.public_instance.public_ip
+  content  = aws_instance.host.public_ip
   filename = "../${path.root}/${var.instance_name}.txt"
 }

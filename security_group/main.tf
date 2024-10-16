@@ -9,6 +9,15 @@ resource "aws_security_group" "public_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] 
   }
+   # Allow SSH from anywhere
+  ingress {
+    description = "tcp"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] 
+  }
+
 
   # Allow HTTP from anywhere
   ingress {

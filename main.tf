@@ -54,15 +54,39 @@ module "key_pair" {
 }
 
 # instances
-module "instances" {
+module "web-app-instances" {
   source                    = "./instances"
   ami_id                    = "ami-0a0e5d9c7acc336f1" 
   instance_type             = "t2.micro"
+  instance_name             = "web-app"
   public_subnet_id          = module.public_subnet.subnet_id
   public_sg_id              = module.security_groups.public_sg_id
   depends_on = [ module.internet_gateway ]
   key_name                  = module.key_pair.key_name
- 
+  user_data = ""
+
+}
+
+module "agent-instances" {
+  source                    = "./instances"
+  ami_id                    = "ami-0a0e5d9c7acc336f1" 
+  instance_type             = "t2.micro"
+  instance_name             = "jenkins-agent"
+  public_subnet_id          = module.public_subnet.subnet_id
+  public_sg_id              = module.security_groups.public_sg_id
+  depends_on = [ module.internet_gateway ]
+  key_name                  = module.key_pair.key_name
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt update -y
+              sudo apt install -y python3-pip
+              pip3 install ansible
+              sudo apt install git-all
+              sudo apt-get install openjdk-11-jdk -y
+              curl -fsSL https://test.docker.com -o test-docker.sh
+              sudo sh test-docker.sh
+              EOF
+
 }
 
 # module "s3_bucket" {
@@ -87,3 +111,7 @@ module "instances" {
 #     encrypt        = true
 #   }
 # }
+
+
+
+  
