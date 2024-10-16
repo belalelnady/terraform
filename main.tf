@@ -88,6 +88,31 @@ module "agent-instances" {
               EOF
 
 }
+module "jenkins_host" {
+  source = "./instances"
+  ami_id                    = "ami-0a0e5d9c7acc336f1" 
+  instance_type             = "t2.micro"
+  instance_name             = "jenkins-master"
+  public_subnet_id          = module.public_subnet.subnet_id
+  public_sg_id              = module.security_groups.public_sg_id
+  depends_on = [ module.internet_gateway ]
+  key_name                  = module.key_pair.key_name
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+              https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+              echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+                  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+                  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+              sudo apt-get update
+              sudo apt install openjdk-17-jre-headless -y
+              sudo apt-get install fontconfig openjdk-17-jre -y
+              sudo apt-get install jenkins -y 
+              EOF
+}
+
 
 # module "s3_bucket" {
 #   source = "./s3-bucket"
